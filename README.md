@@ -31,6 +31,8 @@ Implemented now:
 - Sample media provider fallback when Windows media sessions are unavailable.
 - Theme-aware media miniplayer module for light, dark, OLED and transparent modes.
 - Cassette/CD-style media slideout panel with placement-aware top/bottom direction.
+- Media slideout progress bar and formatted playback time.
+- Media controls disable themselves when the current source does not support previous/play-next actions.
 - Core settings model.
 - Settings persistence in the user AppData folder.
 - Widget contract and widget manager.
@@ -43,7 +45,7 @@ Implemented now:
 - Grouping by app identity.
 - Task thumbnails and preview flyouts.
 - Jump lists.
-- Media artwork, progress bar visuals and source preference settings.
+- Media artwork and source preference settings.
 - Tray hosting.
 - Appbar registration and work-area reservation.
 - Multi-monitor support.
@@ -68,4 +70,4 @@ The final product should support:
 
 Open windbar.sln in Visual Studio 2022 or newer and build WindBar.App.
 
-The next milestone is media artwork/progress visuals and source preference settings, plus a safer app identity/grouping model for task buttons.
+The next milestone is media artwork and source preference settings, plus a safer app identity/grouping model for task buttons.
