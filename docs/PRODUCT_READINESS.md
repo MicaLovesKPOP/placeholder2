@@ -6,7 +6,7 @@ This document tracks the requirements that must be met before WindBar can be hon
 
 WindBar does **not** meet the current non-future requirements yet.
 
-It is a useful prototype foundation, but it is not yet a robust release-ready Windows taskbar replacement. The most important missing pieces are reliable taskbar-level behavior, robust layout and settings, full app identity matching, tray/appbar support, and validation on real Windows installs.
+It is a useful prototype foundation, but it is not yet a robust release-ready Windows taskbar replacement. The most important missing pieces are reliable taskbar-level behavior, robust layout and settings, full app identity matching, tray support, and validation on real Windows installs.
 
 ## Non-future requirements before calling it ready
 
@@ -18,8 +18,8 @@ These are the requirements that should be considered part of the current product
 - [x] Draw a custom topmost taskbar surface.
 - [x] Support bottom placement.
 - [x] Support top placement.
-- [ ] Reserve screen work area using appbar registration.
-- [ ] Avoid overlapping maximized windows.
+- [x] Reserve screen work area using appbar registration.
+- [x] Avoid overlapping maximized windows.
 - [ ] Provide a safe fallback/exit path back to the native Windows taskbar.
 - [ ] Survive Explorer restarts and common shell state changes.
 
