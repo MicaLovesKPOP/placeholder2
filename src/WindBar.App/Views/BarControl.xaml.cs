@@ -4,7 +4,7 @@ namespace WindBar.App.Views
     {
         public BarControl()
         {
-            InitializeComponent();
+            Content = new System.Windows.Controls.TextBlock { Text = "WindBar" };
         }
     }
 }
