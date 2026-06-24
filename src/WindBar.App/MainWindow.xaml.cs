@@ -112,7 +112,7 @@ namespace WindBar.App
 
             if (_settings.ShowMediaMiniPlayer)
             {
-                _mediaMiniPlayer = new MediaMiniPlayerModule(_mediaProvider, _settings.Theme);
+                _mediaMiniPlayer = new MediaMiniPlayerModule(_mediaProvider, _settings.Theme, _settings.Edge);
                 _right.Children.Add(_mediaMiniPlayer);
             }
             if (_settings.ShowSettingsButton)
