@@ -104,6 +104,8 @@ namespace WindBar.App
                 _center.Children.Add(MakeButton("Code", null, "Pinned app"));
             }
 
+            if (_settings.ShowSettingsButton)
+                _right.Children.Add(MakeButton("Settings", OpenSettings, "WindBar settings"));
             if (_settings.ShowThemeButton)
                 _right.Children.Add(MakeButton("Theme", CycleTheme, "Cycle theme"));
             if (_settings.ShowPlacementButton)
@@ -158,6 +160,20 @@ namespace WindBar.App
         {
             _settings.StartProviderId = id;
             _settingsStore.Save(_settings);
+        }
+
+        private void OpenSettings(object sender, RoutedEventArgs e)
+        {
+            var settings = new SettingsWindow(_settings, _settingsStore, ApplySettingsFromWindow);
+            settings.Owner = this;
+            settings.Show();
+        }
+
+        private void ApplySettingsFromWindow()
+        {
+            BuildUi();
+            ApplyTheme();
+            ApplyPlacement();
         }
 
         private void ShowStart(object sender, RoutedEventArgs e)
