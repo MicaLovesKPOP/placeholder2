@@ -39,5 +39,6 @@ namespace WindBar.Core
         public bool ShowPlacementButton { get; set; } = true;
         public bool ShowAutoHideButton { get; set; } = true;
         public bool ShowClock { get; set; } = true;
+        public bool ShowSettingsButton { get; set; } = true;
     }
 }
