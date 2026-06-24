@@ -6,7 +6,7 @@ This document tracks the requirements that must be met before WindBar can be hon
 
 WindBar does **not** meet the current non-future requirements yet.
 
-It is a useful prototype foundation, but it is not yet a robust release-ready Windows taskbar replacement. The most important missing pieces are reliable taskbar-level behavior, robust layout and settings, proper app identity/grouping, tray/appbar support, and validation on real Windows installs.
+It is a useful prototype foundation, but it is not yet a robust release-ready Windows taskbar replacement. The most important missing pieces are reliable taskbar-level behavior, robust layout and settings, full app identity matching, tray/appbar support, and validation on real Windows installs.
 
 ## Non-future requirements before calling it ready
 
@@ -43,8 +43,10 @@ These are the requirements that should be considered part of the current product
 - [x] Running app discovery.
 - [x] Running app activation.
 - [x] Minimize currently active running app on click.
-- [ ] App identity matching between pinned and running apps.
-- [ ] Group multiple windows from the same app.
+- [x] Running apps grouped by executable identity.
+- [x] Direct executable-path matching between pinned and running apps.
+- [ ] Shortcut/AppUserModelID identity matching between pinned and running apps.
+- [x] Group multiple windows from the same app.
 - [ ] Stable app icons instead of text-only buttons.
 - [ ] Reasonable overflow handling when there are too many pinned/running apps.
 
