@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace WindBar.Core
 {
     public enum BarEdge
@@ -24,6 +27,13 @@ namespace WindBar.Core
         Right
     }
 
+    public sealed class TaskbarModulePlacement
+    {
+        public string Id { get; set; } = string.Empty;
+        public ModuleZone Zone { get; set; }
+        public int Order { get; set; }
+    }
+
     public sealed class WindBarSettings
     {
         public BarEdge Edge { get; set; } = BarEdge.Bottom;
@@ -42,5 +52,39 @@ namespace WindBar.Core
         public bool ShowAutoHideButton { get; set; } = true;
         public bool ShowClock { get; set; } = true;
         public bool ShowSettingsButton { get; set; } = true;
+        public List<TaskbarModulePlacement> ModuleLayout { get; set; } = CreateDefaultModuleLayout();
+
+        public void EnsureModuleLayoutDefaults()
+        {
+            ModuleLayout ??= new List<TaskbarModulePlacement>();
+            foreach (var placement in CreateDefaultModuleLayout())
+            {
+                if (ModuleLayout.All(existing => existing.Id != placement.Id))
+                    ModuleLayout.Add(placement);
+            }
+        }
+
+        public IEnumerable<TaskbarModulePlacement> GetOrderedModuleLayout()
+        {
+            EnsureModuleLayoutDefaults();
+            return ModuleLayout.OrderBy(module => module.Zone).ThenBy(module => module.Order).ThenBy(module => module.Id);
+        }
+
+        private static List<TaskbarModulePlacement> CreateDefaultModuleLayout()
+        {
+            return new List<TaskbarModulePlacement>
+            {
+                new TaskbarModulePlacement { Id = "start", Zone = ModuleZone.Left, Order = 10 },
+                new TaskbarModulePlacement { Id = "search", Zone = ModuleZone.Left, Order = 20 },
+                new TaskbarModulePlacement { Id = "start.switcher", Zone = ModuleZone.Left, Order = 30 },
+                new TaskbarModulePlacement { Id = "taskbar.apps", Zone = ModuleZone.Center, Order = 10 },
+                new TaskbarModulePlacement { Id = "media", Zone = ModuleZone.Right, Order = 10 },
+                new TaskbarModulePlacement { Id = "settings", Zone = ModuleZone.Right, Order = 20 },
+                new TaskbarModulePlacement { Id = "theme", Zone = ModuleZone.Right, Order = 30 },
+                new TaskbarModulePlacement { Id = "placement", Zone = ModuleZone.Right, Order = 40 },
+                new TaskbarModulePlacement { Id = "autohide", Zone = ModuleZone.Right, Order = 50 },
+                new TaskbarModulePlacement { Id = "clock", Zone = ModuleZone.Right, Order = 60 }
+            };
+        }
     }
 }
