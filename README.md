@@ -1,6 +1,6 @@
 # WindBar
 
-WindBar is an Explorer-safe Windows 11 taskbar replacement prototype written in C# and WPF. It keeps Explorer alive, draws its own topmost taskbar, and provides the groundwork for a modular taskbar with Start menu providers, widgets, themes, top and bottom placement, auto-hide, smart app discovery, persistent pinned apps, running-app visibility/activation/toggling, universal media miniplayer groundwork, and future per-monitor layouts.
+WindBar is an Explorer-safe Windows 11 taskbar replacement prototype written in C# and WPF. It keeps Explorer alive, draws its own topmost taskbar, and provides the groundwork for a modular taskbar with Start menu providers, widgets, themes, top and bottom placement, auto-hide, smart app discovery, persistent pinned apps, running-app visibility/activation/toggling, a universal media miniplayer, and future per-monitor layouts.
 
 ## Current prototype
 
@@ -27,7 +27,9 @@ Implemented now:
 - Running-app buttons now show a different marker for the current foreground window.
 - Clicking an already-foreground running app minimizes it, while clicking an inactive running app restores/activates it.
 - Universal media session models and provider contract.
-- First visible media miniplayer module using a sample universal media provider.
+- Windows media-session provider for the universal media miniplayer.
+- Sample media provider fallback when Windows media sessions are unavailable.
+- Theme-aware media miniplayer module for light, dark, OLED and transparent modes.
 - Core settings model.
 - Settings persistence in the user AppData folder.
 - Widget contract and widget manager.
@@ -40,7 +42,7 @@ Implemented now:
 - Grouping by app identity.
 - Task thumbnails and preview flyouts.
 - Jump lists.
-- Real Windows media session provider for the miniplayer.
+- Hover/expanded media miniplayer flyout.
 - Tray hosting.
 - Appbar registration and work-area reservation.
 - Multi-monitor support.
@@ -65,4 +67,4 @@ The final product should support:
 
 Open windbar.sln in Visual Studio 2022 or newer and build WindBar.App.
 
-The next milestone is a real Windows media session provider for the miniplayer, plus a safer app identity/grouping model for task buttons.
+The next milestone is a hover/expanded media miniplayer flyout, plus a safer app identity/grouping model for task buttons.
