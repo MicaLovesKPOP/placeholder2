@@ -1,6 +1,6 @@
 # WindBar
 
-WindBar is an Explorer-safe Windows 11 taskbar replacement prototype written in C# and WPF. It keeps Explorer alive, draws its own topmost taskbar, and provides the groundwork for a modular taskbar with Start menu providers, widgets, themes, top and bottom placement, auto-hide, smart app discovery, persistent pinned apps, running-app visibility, and future per-monitor layouts.
+WindBar is an Explorer-safe Windows 11 taskbar replacement prototype written in C# and WPF. It keeps Explorer alive, draws its own topmost taskbar, and provides the groundwork for a modular taskbar with Start menu providers, widgets, themes, top and bottom placement, auto-hide, smart app discovery, persistent pinned apps, running-app visibility/activation, and future per-monitor layouts.
 
 ## Current prototype
 
@@ -23,13 +23,23 @@ Implemented now:
 - Persistent pinned app model, store and service.
 - Center taskbar zone loads saved pins or creates first-run pins from smart discovery.
 - Center taskbar zone can also show running apps and refreshes that list periodically.
+- Running-app buttons can now activate/restore their windows through Win32.
 - Core settings model.
 - Settings persistence in the user AppData folder.
 - Widget contract and widget manager.
 - App scanner for Start menu shortcuts, desktop shortcuts and selected portable app folders.
 - Start surfaces that populate from discovered apps and group them by simple heuristics.
-- Initial running-app discovery service. It is visible now, but activation, minimize/restore, grouping and thumbnails still need proper Win32 handling.
 - GitHub Actions build workflow on Windows.
+
+## Still needed for real taskbar parity
+
+- Minimize/restore toggle behavior for already-active windows.
+- Grouping by app identity.
+- Task thumbnails and preview flyouts.
+- Jump lists.
+- Tray hosting.
+- Appbar registration and work-area reservation.
+- Multi-monitor support.
 
 ## Product direction
 
@@ -51,4 +61,4 @@ The final product should support:
 
 Open windbar.sln in Visual Studio 2022 or newer and build WindBar.App.
 
-The next milestone is to make running app buttons activate/minimize/restore windows, then implement tray and appbar hosting.
+The next milestone is to add minimize/restore toggle behavior and a safer app identity/grouping model.
