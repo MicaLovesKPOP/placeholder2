@@ -20,20 +20,30 @@ namespace WindBar.App.Services
         {
             try
             {
-                if (!File.Exists(_path)) return new WindBarSettings();
+                if (!File.Exists(_path)) return CreateDefaultSettings();
                 var json = File.ReadAllText(_path);
-                return JsonSerializer.Deserialize<WindBarSettings>(json) ?? new WindBarSettings();
+                var settings = JsonSerializer.Deserialize<WindBarSettings>(json) ?? new WindBarSettings();
+                settings.EnsureModuleLayoutDefaults();
+                return settings;
             }
             catch
             {
-                return new WindBarSettings();
+                return CreateDefaultSettings();
             }
         }
 
         public void Save(WindBarSettings settings)
         {
+            settings.EnsureModuleLayoutDefaults();
             var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(_path, json);
+        }
+
+        private static WindBarSettings CreateDefaultSettings()
+        {
+            var settings = new WindBarSettings();
+            settings.EnsureModuleLayoutDefaults();
+            return settings;
         }
     }
 }
