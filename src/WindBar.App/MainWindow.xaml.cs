@@ -79,15 +79,23 @@ namespace WindBar.App
             _root.Children.Add(_center);
             _root.Children.Add(_right);
 
-            _left.Children.Add(MakeButton("⊞", ShowStart, "Start"));
-            _left.Children.Add(MakeButton("Search", null, "Search"));
-            _left.Children.Add(MakeButton("11", (_, __) => SelectStart("start.win11"), "Use Windows 11 Start"));
-            _left.Children.Add(MakeButton("10", (_, __) => SelectStart("start.win10"), "Use modern Start"));
-            _left.Children.Add(MakeButton("8.1", (_, __) => SelectStart("start.win81"), "Use full screen Start"));
-
-            foreach (var app in _pinnedAppService.LoadOrCreateDefaults())
+            if (_settings.ShowStartButton)
+                _left.Children.Add(MakeButton("⊞", ShowStart, "Start"));
+            if (_settings.ShowSearchButton)
+                _left.Children.Add(MakeButton("Search", null, "Search"));
+            if (_settings.ShowStartSwitcher)
             {
-                _center.Children.Add(MakeButton(app.Name, (_, __) => Launch(app.Path), app.Path));
+                _left.Children.Add(MakeButton("11", (_, __) => SelectStart("start.win11"), "Use Windows 11 Start"));
+                _left.Children.Add(MakeButton("10", (_, __) => SelectStart("start.win10"), "Use modern Start"));
+                _left.Children.Add(MakeButton("8.1", (_, __) => SelectStart("start.win81"), "Use full screen Start"));
+            }
+
+            if (_settings.ShowPinnedApps)
+            {
+                foreach (var app in _pinnedAppService.LoadOrCreateDefaults())
+                {
+                    _center.Children.Add(MakeButton(app.Name, (_, __) => Launch(app.Path), app.Path));
+                }
             }
             if (_center.Children.Count == 0)
             {
@@ -96,11 +104,17 @@ namespace WindBar.App
                 _center.Children.Add(MakeButton("Code", null, "Pinned app"));
             }
 
-            _right.Children.Add(MakeButton("Theme", CycleTheme, "Cycle theme"));
-            _right.Children.Add(MakeButton("Top/Bottom", ToggleEdge, "Move taskbar"));
-            _right.Children.Add(MakeButton("AutoHide", ToggleAutoHide, "Toggle auto hide"));
-            _clockButton = MakeButton(DateTime.Now.ToString("HH:mm"), null, "Clock");
-            _right.Children.Add(_clockButton);
+            if (_settings.ShowThemeButton)
+                _right.Children.Add(MakeButton("Theme", CycleTheme, "Cycle theme"));
+            if (_settings.ShowPlacementButton)
+                _right.Children.Add(MakeButton("Top/Bottom", ToggleEdge, "Move taskbar"));
+            if (_settings.ShowAutoHideButton)
+                _right.Children.Add(MakeButton("AutoHide", ToggleAutoHide, "Toggle auto hide"));
+            if (_settings.ShowClock)
+            {
+                _clockButton = MakeButton(DateTime.Now.ToString("HH:mm"), null, "Clock");
+                _right.Children.Add(_clockButton);
+            }
         }
 
         private Button MakeButton(string text, RoutedEventHandler? action, string tooltip)
