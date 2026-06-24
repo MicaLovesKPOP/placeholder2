@@ -27,8 +27,15 @@ namespace WindBar.App.Views
         private readonly TextBlock _slideSubtitle = new TextBlock();
         private readonly TextBlock _slideSource = new TextBlock();
         private readonly TextBlock _slideProgress = new TextBlock();
+        private readonly Border _progressTrack = new Border();
+        private readonly Border _progressFill = new Border();
         private readonly Button _slidePlayPause = new Button();
         private readonly List<Button> _controls = new List<Button>();
+        private Button? _previous;
+        private Button? _next;
+        private Button? _slidePrevious;
+        private Button? _slideNext;
+        private MediaSessionState? _lastState;
 
         public MediaMiniPlayerModule(IMediaProvider provider, BarTheme theme, BarEdge edge)
         {
@@ -80,6 +87,13 @@ namespace WindBar.App.Views
             _slideSource.Foreground = secondary;
             _slideProgress.Foreground = secondary;
 
+            _progressTrack.Background = new SolidColorBrush(light
+                ? Color.FromArgb(35, 0, 0, 0)
+                : Color.FromArgb(45, 255, 255, 255));
+            _progressFill.Background = new SolidColorBrush(light
+                ? Color.FromArgb(215, 0, 95, 184)
+                : Color.FromArgb(230, 96, 205, 255));
+
             _badge.Background = new SolidColorBrush(transparent
                 ? Color.FromArgb(210, 200, 40, 40)
                 : Color.FromArgb(180, 200, 40, 40));
@@ -127,15 +141,15 @@ namespace WindBar.App.Views
             textStack.Children.Add(_subtitle);
             row.Children.Add(textStack);
 
-            var previous = MakeControl("⏮", (_, __) => _provider.Previous());
+            _previous = MakeControl("⏮", (_, __) => _provider.Previous());
             _playPause.Click += (_, __) => _provider.PlayPause();
             _playPause.Margin = new Thickness(4, 0, 0, 0);
             _playPause.Padding = new Thickness(6, 0, 6, 0);
             _controls.Add(_playPause);
-            var next = MakeControl("⏭", (_, __) => _provider.Next());
-            row.Children.Add(previous);
+            _next = MakeControl("⏭", (_, __) => _provider.Next());
+            row.Children.Add(_previous);
             row.Children.Add(_playPause);
-            row.Children.Add(next);
+            row.Children.Add(_next);
 
             _shell.Child = row;
             BuildSlideOut();
@@ -175,8 +189,18 @@ namespace WindBar.App.Views
             _slideSource.Margin = new Thickness(0, 10, 0, 0);
             stack.Children.Add(_slideSource);
 
+            _progressTrack.Height = 4;
+            _progressTrack.CornerRadius = new CornerRadius(2);
+            _progressTrack.Margin = new Thickness(0, 12, 0, 0);
+            _progressTrack.Child = _progressFill;
+            _progressTrack.SizeChanged += (_, __) => UpdateProgressFill();
+            _progressFill.Height = 4;
+            _progressFill.HorizontalAlignment = HorizontalAlignment.Left;
+            _progressFill.CornerRadius = new CornerRadius(2);
+            stack.Children.Add(_progressTrack);
+
             _slideProgress.FontSize = 11;
-            _slideProgress.Margin = new Thickness(0, 8, 0, 12);
+            _slideProgress.Margin = new Thickness(0, 6, 0, 12);
             stack.Children.Add(_slideProgress);
 
             var controls = new StackPanel
@@ -184,13 +208,15 @@ namespace WindBar.App.Views
                 Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Right
             };
-            controls.Children.Add(MakeControl("⏮", (_, __) => _provider.Previous()));
+            _slidePrevious = MakeControl("⏮", (_, __) => _provider.Previous());
+            controls.Children.Add(_slidePrevious);
             _slidePlayPause.Margin = new Thickness(6, 0, 0, 0);
             _slidePlayPause.Padding = new Thickness(12, 3, 12, 3);
             _slidePlayPause.Click += (_, __) => _provider.PlayPause();
             _controls.Add(_slidePlayPause);
             controls.Children.Add(_slidePlayPause);
-            controls.Children.Add(MakeControl("⏭", (_, __) => _provider.Next()));
+            _slideNext = MakeControl("⏭", (_, __) => _provider.Next());
+            controls.Children.Add(_slideNext);
             stack.Children.Add(controls);
 
             _slideSurface.Child = stack;
@@ -262,6 +288,7 @@ namespace WindBar.App.Views
         private void Refresh()
         {
             var state = _provider.Current;
+            _lastState = state;
             _title.Text = state.HasMedia ? state.Title : "Nothing playing";
             _subtitle.Text = state.HasMedia ? $"{state.Artist} • {state.SourceName}" : state.SourceName;
             _slideTitle.Text = state.HasMedia ? state.Title : "Nothing playing";
@@ -271,7 +298,42 @@ namespace WindBar.App.Views
             var playPauseText = state.PlaybackState == MediaPlaybackState.Playing ? "⏸" : "▶";
             _playPause.Content = playPauseText;
             _slidePlayPause.Content = playPauseText;
+            UpdateControlAvailability(state);
+            UpdateProgressFill();
             ToolTip = $"{state.Title}\n{state.Artist}\n{state.SourceName}";
+        }
+
+        private void UpdateControlAvailability(MediaSessionState state)
+        {
+            SetButtonEnabled(_previous, state.CanGoPrevious);
+            SetButtonEnabled(_slidePrevious, state.CanGoPrevious);
+            SetButtonEnabled(_playPause, state.CanPlayPause);
+            SetButtonEnabled(_slidePlayPause, state.CanPlayPause);
+            SetButtonEnabled(_next, state.CanGoNext);
+            SetButtonEnabled(_slideNext, state.CanGoNext);
+        }
+
+        private static void SetButtonEnabled(Button? button, bool enabled)
+        {
+            if (button == null) return;
+            button.IsEnabled = enabled;
+            button.Opacity = enabled ? 1.0 : 0.35;
+        }
+
+        private void UpdateProgressFill()
+        {
+            var state = _lastState;
+            var ratio = GetProgressRatio(state);
+            _progressFill.Width = _progressTrack.ActualWidth * ratio;
+            _progressTrack.Opacity = ratio > 0 ? 1.0 : 0.45;
+        }
+
+        private static double GetProgressRatio(MediaSessionState? state)
+        {
+            if (state?.PositionSeconds == null || state.DurationSeconds == null || state.DurationSeconds <= 0)
+                return 0;
+
+            return Math.Max(0, Math.Min(1, state.PositionSeconds.Value / state.DurationSeconds.Value));
         }
 
         private static string FormatProgress(MediaSessionState state)
