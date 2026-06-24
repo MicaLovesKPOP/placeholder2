@@ -1,24 +1,22 @@
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using WindBar.Core;
 
 namespace WindBar.App.Views
 {
     public partial class StartMenu11 : UserControl, IStartMenuProvider
     {
+        private readonly AppScanner _scanner = new AppScanner();
+
         public StartMenu11()
         {
-            Content = new TextBlock
-            {
-                Text = "Windows 11 style Start",
-                Foreground = Brushes.White,
-                FontSize = 24,
-                Margin = new Thickness(24)
-            };
+            Content = CreateView();
         }
 
         public string DisplayName => "Windows 11 Start";
-        public object CreateView() => this;
+
+        public object CreateView()
+        {
+            return new StartSurface("Windows 11 Start", _scanner.ScanSmartDefaults());
+        }
     }
 }
