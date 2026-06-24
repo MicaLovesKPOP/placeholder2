@@ -42,6 +42,7 @@ Implemented now:
 - Widget contract and widget manager.
 - App scanner for Start menu shortcuts, desktop shortcuts and selected portable app folders.
 - Start surfaces that populate from discovered apps and group them by simple heuristics.
+- Start surfaces can filter apps by name, group or path.
 - Start surfaces can launch apps by double-click or Enter.
 - GitHub Actions build workflow on Windows.
 
