@@ -21,6 +21,7 @@ namespace WindBar.App
         private readonly PinnedAppService _pinnedAppService = new PinnedAppService();
         private readonly OpenAppService _openAppService = new OpenAppService();
         private readonly AppIconService _appIconService = new AppIconService();
+        private readonly AppBarService _appBarService = new AppBarService();
         private readonly IMediaProvider _mediaProvider;
         private readonly WindBarSettings _settings;
         private readonly Grid _root = new Grid();
@@ -56,7 +57,12 @@ namespace WindBar.App
             ApplyPlacement();
             StartClock();
             StartRunningRefresh();
-            Closing += (_, __) => _settingsStore.Save(_settings);
+            SourceInitialized += (_, __) => ApplyPlacement();
+            Closing += (_, __) =>
+            {
+                _settingsStore.Save(_settings);
+                _appBarService.Unregister();
+            };
         }
 
         private void RegisterStartProviders()
@@ -353,10 +359,14 @@ namespace WindBar.App
 
         private void ApplyPlacement()
         {
-            Width = SystemParameters.PrimaryScreenWidth;
-            Height = _settings.BarThickness;
-            Left = 0;
-            Top = _settings.Edge == BarEdge.Bottom ? SystemParameters.PrimaryScreenHeight - Height : 0;
+            if (!_appBarService.RegisterOrUpdate(this, _settings.Edge, _settings.BarThickness))
+            {
+                Width = SystemParameters.PrimaryScreenWidth;
+                Height = _settings.BarThickness;
+                Left = 0;
+                Top = _settings.Edge == BarEdge.Bottom ? SystemParameters.PrimaryScreenHeight - Height : 0;
+            }
+
             _isHidden = false;
         }
 
