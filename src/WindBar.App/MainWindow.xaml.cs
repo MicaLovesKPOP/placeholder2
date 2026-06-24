@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -133,22 +134,35 @@ namespace WindBar.App
         private void BuildCenterZone()
         {
             _center.Children.Clear();
+            var openGroups = _openAppService.GetOpenAppGroups().ToList();
+            var openKeys = openGroups.Select(group => group.AppKey).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var shownOpenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
             if (_settings.ShowPinnedApps)
             {
                 foreach (var app in _pinnedAppService.LoadOrCreateDefaults())
                 {
-                    _center.Children.Add(MakeButton(app.Name, (_, __) => Launch(app.Path), app.Path));
+                    var key = OpenAppService.CreateAppKey(string.Empty, app.Path);
+                    var isRunning = openKeys.Contains(key);
+                    var label = isRunning ? "● " + app.Name : app.Name;
+                    _center.Children.Add(MakeButton(label, (_, __) => Launch(app.Path), app.Path));
+                    if (isRunning)
+                        shownOpenKeys.Add(key);
                 }
             }
 
             if (_settings.ShowOpenApps)
             {
                 var added = 0;
-                foreach (var app in _openAppService.GetOpenApps())
+                foreach (var group in openGroups)
                 {
+                    if (shownOpenKeys.Contains(group.AppKey))
+                        continue;
+
                     if (added >= 6) break;
-                    var marker = app.IsActive ? "● " : "○ ";
-                    _center.Children.Add(MakeButton(marker + app.ProcessName, (_, __) => _openAppService.ActivateOrToggle(app), app.Title));
+                    var marker = group.IsActive ? "● " : "○ ";
+                    var suffix = group.WindowCount > 1 ? $" ({group.WindowCount})" : string.Empty;
+                    _center.Children.Add(MakeButton(marker + group.DisplayName + suffix, (_, __) => _openAppService.ActivateOrToggle(group.PrimaryWindow), group.PrimaryWindow.Title));
                     added++;
                 }
             }
