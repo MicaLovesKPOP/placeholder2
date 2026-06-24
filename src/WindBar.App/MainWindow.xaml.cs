@@ -20,6 +20,7 @@ namespace WindBar.App
         private readonly SettingsStore _settingsStore = new SettingsStore();
         private readonly PinnedAppService _pinnedAppService = new PinnedAppService();
         private readonly OpenAppService _openAppService = new OpenAppService();
+        private readonly AppIconService _appIconService = new AppIconService();
         private readonly IMediaProvider _mediaProvider;
         private readonly WindBarSettings _settings;
         private readonly Grid _root = new Grid();
@@ -141,7 +142,7 @@ namespace WindBar.App
         private void BuildCenterZone()
         {
             _center.Children.Clear();
-            var centerItems = new List<(string Text, RoutedEventHandler? Action, string Tooltip)>();
+            var centerItems = new List<(string Text, RoutedEventHandler? Action, string Tooltip, string IconPath)>();
             var openGroups = _openAppService.GetOpenAppGroups().ToList();
             var openKeys = openGroups.Select(group => group.AppKey).ToHashSet(StringComparer.OrdinalIgnoreCase);
             var shownOpenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -153,7 +154,7 @@ namespace WindBar.App
                     var key = OpenAppService.CreateAppKey(string.Empty, app.Path);
                     var isRunning = openKeys.Contains(key);
                     var label = isRunning ? "● " + app.Name : app.Name;
-                    centerItems.Add((label, (_, __) => Launch(app.Path), app.Path));
+                    centerItems.Add((label, (_, __) => Launch(app.Path), app.Path, app.Path));
                     if (isRunning)
                         shownOpenKeys.Add(key);
                 }
@@ -168,7 +169,7 @@ namespace WindBar.App
 
                     var marker = group.IsActive ? "● " : "○ ";
                     var suffix = group.WindowCount > 1 ? $" ({group.WindowCount})" : string.Empty;
-                    centerItems.Add((marker + group.DisplayName + suffix, (_, __) => _openAppService.ActivateOrToggle(group.PrimaryWindow), group.PrimaryWindow.Title));
+                    centerItems.Add((marker + group.DisplayName + suffix, (_, __) => _openAppService.ActivateOrToggle(group.PrimaryWindow), group.PrimaryWindow.Title, group.ExecutablePath));
                 }
             }
 
@@ -183,7 +184,7 @@ namespace WindBar.App
             var visibleCount = centerItems.Count <= MaxCenterButtons ? centerItems.Count : MaxCenterButtons - 1;
             foreach (var item in centerItems.Take(visibleCount))
             {
-                _center.Children.Add(MakeButton(item.Text, item.Action, item.Tooltip));
+                _center.Children.Add(MakeAppButton(item.Text, item.Action, item.Tooltip, item.IconPath));
             }
 
             var hiddenCount = centerItems.Count - visibleCount;
@@ -206,6 +207,39 @@ namespace WindBar.App
                 Cursor = Cursors.Hand
             };
             if (action != null) button.Click += action;
+            return button;
+        }
+
+        private Button MakeAppButton(string text, RoutedEventHandler? action, string tooltip, string iconPath)
+        {
+            var button = MakeButton(text, action, tooltip);
+            var icon = _appIconService.GetIcon(iconPath);
+            if (icon == null)
+                return button;
+
+            button.Padding = new Thickness(8, 0, 10, 0);
+            button.Content = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                VerticalAlignment = VerticalAlignment.Center,
+                Children =
+                {
+                    new Image
+                    {
+                        Source = icon,
+                        Width = 16,
+                        Height = 16,
+                        Margin = new Thickness(0, 0, 7, 0),
+                        VerticalAlignment = VerticalAlignment.Center
+                    },
+                    new TextBlock
+                    {
+                        Text = text,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        TextTrimming = TextTrimming.CharacterEllipsis
+                    }
+                }
+            };
             return button;
         }
 
@@ -352,6 +386,24 @@ namespace WindBar.App
                     button.Foreground = foreground;
                     button.Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
                     button.BorderBrush = new SolidColorBrush(Color.FromArgb(35, 255, 255, 255));
+                    ApplyForegroundToButtonContent(button.Content, foreground);
+                }
+            }
+        }
+
+        private static void ApplyForegroundToButtonContent(object? content, Brush foreground)
+        {
+            if (content is TextBlock textBlock)
+            {
+                textBlock.Foreground = foreground;
+                return;
+            }
+
+            if (content is Panel panel)
+            {
+                foreach (var child in panel.Children)
+                {
+                    ApplyForegroundToButtonContent(child, foreground);
                 }
             }
         }
