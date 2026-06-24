@@ -83,13 +83,37 @@ namespace WindBar.App
             Topmost = true;
             ShowInTaskbar = false;
             Content = _root;
+            ContextMenu = BuildRecoveryMenu();
             MouseEnter += (_, __) => RevealFromAutoHide();
             MouseLeave += (_, __) => HideIfAutoHide();
-            MouseRightButtonUp += (_, e) =>
-            {
-                OpenSettingsWindow();
-                e.Handled = true;
-            };
+        }
+
+        private ContextMenu BuildRecoveryMenu()
+        {
+            var menu = new ContextMenu();
+            var settings = new MenuItem { Header = "WindBar Settings" };
+            settings.Click += (_, __) => OpenSettingsWindow();
+            menu.Items.Add(settings);
+            menu.Items.Add(new Separator());
+
+            var exit = new MenuItem { Header = "Exit WindBar" };
+            exit.Click += (_, __) => ConfirmExitWindBar();
+            menu.Items.Add(exit);
+            return menu;
+        }
+
+        private void ConfirmExitWindBar()
+        {
+            var result = MessageBox.Show(
+                this,
+                "Exit WindBar and return to the native Windows taskbar? WindBar will unregister its reserved screen area before closing.",
+                "Exit WindBar",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning,
+                MessageBoxResult.No);
+
+            if (result == MessageBoxResult.Yes)
+                Close();
         }
 
         private void BuildUi()
