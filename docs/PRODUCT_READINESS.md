@@ -20,7 +20,7 @@ These are the requirements that should be considered part of the current product
 - [x] Support top placement.
 - [x] Reserve screen work area using appbar registration.
 - [x] Avoid overlapping maximized windows.
-- [ ] Provide a safe fallback/exit path back to the native Windows taskbar.
+- [x] Provide a safe fallback/exit path back to the native Windows taskbar.
 - [ ] Survive Explorer restarts and common shell state changes.
 
 ### Taskbar modules
