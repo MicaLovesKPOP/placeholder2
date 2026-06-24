@@ -1,20 +1,46 @@
 # WindBar
 
-WindBar is a custom Windows 11 taskbar replacement written in C#/.NET. It aims to look and feel like the native Windows 11 taskbar while providing advanced features such as multiple start menu experiences (Windows 11, Windows 10 re‑imagined, and Windows 7 re‑imagined), a flexible widget system, and support for top/bottom alignment with future expansion to left/right edges.
+WindBar is an Explorer-safe Windows 11 taskbar replacement prototype written in C# and WPF. It keeps Explorer alive, draws its own topmost taskbar, and provides the groundwork for a modular taskbar with Start menu providers, widgets, themes, top and bottom placement, auto-hide, and future per-monitor layouts.
 
-## Features
+## Current prototype
 
-- Looks and behaves like the built‑in Windows 11 taskbar by default.
-- Multiple start menu providers: Windows 11 style, Windows 10 style re‑imagined with modern Mica/Fluent visual language, Windows 7 style re‑imagined.
-- Widget framework with a plug‑in architecture; widgets declare whether they support horizontal/vertical bars and fallback modes.
-- Automatic app scanning for pinned apps and start menu population, including detection of portable apps in user‑selected folders.
-- Top/bottom alignment support with the infrastructure for left/right edges in the future.
-- Designed for multi‑monitor scenarios; the architecture supports per‑monitor bar instances.
+The current build is a code-only WPF app. It avoids XAML build issues by disabling default XAML compilation and creating the UI from C#.
 
-## Architecture
+Implemented now:
 
-`WindBar.Core` contains the core abstractions (`IStartProvider`, `IWidget`), a simple `WidgetManager` to register and manage widgets, and an `AppScanner` stub to discover installed and portable applications.
+- Top or bottom taskbar placement on the primary monitor.
+- Auto-hide prototype.
+- Light, dark, OLED and transparent theme modes.
+- Left, center and right taskbar zones.
+- Start provider switching buttons.
+- Windows 11 style Start provider placeholder.
+- Windows 10 style Start provider placeholder.
+- Windows 8.1 full-screen Start screen provider placeholder.
+- Classic Start provider placeholder.
+- Clock module.
+- Pinned app placeholder buttons.
+- Core settings model.
+- Widget contract and widget manager.
+- App scanner stub for installed and portable app discovery.
 
-`WindBar.App` is a WPF application that hosts the custom bar. `MainWindow` creates a `TaskbarControl` that renders the bar at the top or bottom of the primary monitor. The bar can switch start menu providers dynamically and can be extended via widgets.
+## Product direction
 
-Most of the functionality is currently scaffolding; the TODO comments mark places where contributions are needed to implement the full behaviour.
+WindBar should eventually feel indistinguishable from the Windows 11 taskbar by default while giving power users much deeper control.
+
+The final product should support:
+
+- A native-feeling Windows 11 taskbar design.
+- Optional modules for Start, search, pinned apps, running apps, tray, clock, action center, widgets and media.
+- User-controlled left, center and right placement of modules.
+- Fully functional Windows 11, Windows 10 and Windows 8.1 Start experiences using Windows 11 visual language.
+- Smart app discovery and grouping for installed apps and portable apps.
+- Top and bottom placement first, then left, right and per-monitor placement later.
+- Light, dark, OLED and transparent themes.
+- Appbar registration for proper work-area reservation.
+- Safe fallback to the native Windows taskbar.
+
+## Build
+
+Open windbar.sln in Visual Studio 2022 or newer and build WindBar.App.
+
+The next milestone is to replace placeholders with real module services and a real appbar host.
