@@ -47,7 +47,7 @@ These are the requirements that should be considered part of the current product
 - [x] Direct executable-path matching between pinned and running apps.
 - [ ] Shortcut/AppUserModelID identity matching between pinned and running apps.
 - [x] Group multiple windows from the same app.
-- [ ] Stable app icons instead of text-only buttons.
+- [x] Stable app icons instead of text-only buttons.
 - [x] Reasonable overflow handling when there are too many pinned/running apps.
 
 ### Start menu surfaces
