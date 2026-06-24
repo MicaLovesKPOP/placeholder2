@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using WindBar.App.Services;
 using WindBar.App.Views;
 using WindBar.Core;
 
@@ -12,7 +13,8 @@ namespace WindBar.App
 {
     public partial class MainWindow : Window
     {
-        private readonly WindBarSettings _settings = new WindBarSettings();
+        private readonly SettingsStore _settingsStore = new SettingsStore();
+        private readonly WindBarSettings _settings;
         private readonly Grid _root = new Grid();
         private readonly StackPanel _left = new StackPanel { Orientation = Orientation.Horizontal };
         private readonly StackPanel _center = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center };
@@ -24,12 +26,14 @@ namespace WindBar.App
 
         public MainWindow()
         {
+            _settings = _settingsStore.Load();
             RegisterStartProviders();
             ConfigureWindow();
             BuildUi();
             ApplyTheme();
             ApplyPlacement();
             StartClock();
+            Closing += (_, __) => _settingsStore.Save(_settings);
         }
 
         private void RegisterStartProviders()
@@ -76,8 +80,8 @@ namespace WindBar.App
             _left.Children.Add(MakeButton("⊞", ShowStart, "Start"));
             _left.Children.Add(MakeButton("Search", null, "Search"));
             _left.Children.Add(MakeButton("11", (_, __) => SelectStart("start.win11"), "Use Windows 11 Start"));
-            _left.Children.Add(MakeButton("10", (_, __) => SelectStart("start.win10"), "Use Windows 10 Start"));
-            _left.Children.Add(MakeButton("8.1", (_, __) => SelectStart("start.win81"), "Use Windows 8.1 Start screen"));
+            _left.Children.Add(MakeButton("10", (_, __) => SelectStart("start.win10"), "Use modern Start"));
+            _left.Children.Add(MakeButton("8.1", (_, __) => SelectStart("start.win81"), "Use full screen Start"));
 
             _center.Children.Add(MakeButton("Edge", null, "Pinned app"));
             _center.Children.Add(MakeButton("Files", null, "Pinned app"));
@@ -119,6 +123,7 @@ namespace WindBar.App
         private void SelectStart(string id)
         {
             _settings.StartProviderId = id;
+            _settingsStore.Save(_settings);
         }
 
         private void ShowStart(object sender, RoutedEventArgs e)
@@ -136,9 +141,9 @@ namespace WindBar.App
                 ResizeMode = ResizeMode.NoResize,
                 Topmost = true,
                 ShowInTaskbar = false,
-                Content = content
+                Content = content,
+                Background = Background
             };
-            start.Background = Background;
             start.Top = _settings.Edge == BarEdge.Bottom ? SystemParameters.PrimaryScreenHeight - Height - start.Height - 12 : Height + 12;
             start.Deactivated += (_, __) => start.Close();
             start.Show();
@@ -148,6 +153,7 @@ namespace WindBar.App
         {
             _settings.Edge = _settings.Edge == BarEdge.Bottom ? BarEdge.Top : BarEdge.Bottom;
             ApplyPlacement();
+            _settingsStore.Save(_settings);
         }
 
         private void ToggleAutoHide(object sender, RoutedEventArgs e)
@@ -155,6 +161,7 @@ namespace WindBar.App
             _settings.AutoHide = !_settings.AutoHide;
             if (!_settings.AutoHide) RevealFromAutoHide();
             else HideIfAutoHide();
+            _settingsStore.Save(_settings);
         }
 
         private void CycleTheme(object sender, RoutedEventArgs e)
@@ -167,6 +174,7 @@ namespace WindBar.App
                 _ => BarTheme.Dark
             };
             ApplyTheme();
+            _settingsStore.Save(_settings);
         }
 
         private void ApplyPlacement()
