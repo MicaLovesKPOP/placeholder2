@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using WindBar.App.Services;
@@ -16,6 +18,9 @@ namespace WindBar.App
     public partial class MainWindow : Window
     {
         private const int MaxCenterButtons = 10;
+        private const int WM_DISPLAYCHANGE = 0x007E;
+        private const int WM_SETTINGCHANGE = 0x001A;
+        private static readonly int TaskbarCreatedMessage = RegisterWindowMessage("TaskbarCreated");
 
         private readonly SettingsStore _settingsStore = new SettingsStore();
         private readonly PinnedAppService _pinnedAppService = new PinnedAppService();
@@ -31,6 +36,7 @@ namespace WindBar.App
         private readonly Dictionary<string, IStartMenuProvider> _startProviders = new Dictionary<string, IStartMenuProvider>();
         private readonly DispatcherTimer _clock = new DispatcherTimer();
         private readonly DispatcherTimer _runningRefresh = new DispatcherTimer();
+        private HwndSource? _source;
         private MediaMiniPlayerModule? _mediaMiniPlayer;
         private Button? _clockButton;
         private bool _isHidden;
@@ -57,10 +63,11 @@ namespace WindBar.App
             ApplyPlacement();
             StartClock();
             StartRunningRefresh();
-            SourceInitialized += (_, __) => ApplyPlacement();
+            SourceInitialized += (_, __) => InitializeShellHooks();
             Closing += (_, __) =>
             {
                 _settingsStore.Save(_settings);
+                _source?.RemoveHook(WndProc);
                 _appBarService.Unregister();
             };
         }
@@ -114,6 +121,35 @@ namespace WindBar.App
 
             if (result == MessageBoxResult.Yes)
                 Close();
+        }
+
+        private void InitializeShellHooks()
+        {
+            var handle = new WindowInteropHelper(this).Handle;
+            if (handle != IntPtr.Zero)
+            {
+                _source = HwndSource.FromHwnd(handle);
+                _source?.AddHook(WndProc);
+            }
+
+            ApplyPlacement();
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == TaskbarCreatedMessage || msg == WM_DISPLAYCHANGE || msg == WM_SETTINGCHANGE)
+            {
+                Dispatcher.BeginInvoke(new Action(RefreshShellState));
+            }
+
+            return IntPtr.Zero;
+        }
+
+        private void RefreshShellState()
+        {
+            ApplyPlacement();
+            BuildCenterZone();
+            ApplyTheme();
         }
 
         private void BuildUi()
@@ -455,5 +491,8 @@ namespace WindBar.App
             Top = _settings.Edge == BarEdge.Bottom ? SystemParameters.PrimaryScreenHeight - Height : 0;
             _isHidden = false;
         }
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern int RegisterWindowMessage(string lpString);
     }
 }
