@@ -12,7 +12,8 @@ Implemented now:
 - Auto-hide prototype.
 - Light, dark, OLED and transparent theme modes.
 - Left, center and right taskbar zones.
-- Module visibility flags for Start, Search, Start switcher, pinned apps, theme, placement, auto-hide and clock.
+- Module visibility flags for Start, Search, Start switcher, pinned apps, theme, placement, auto-hide, settings and clock.
+- Settings window for toggling modules, changing theme, switching top/bottom placement, enabling auto-hide and choosing Start style.
 - Start provider switching buttons.
 - Windows 11 style Start provider.
 - Modern Start provider inspired by the Windows 10 layout.
