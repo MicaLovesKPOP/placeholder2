@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -11,8 +12,22 @@ namespace WindBar.App.Views
 {
     public sealed class StartSurface : UserControl
     {
+        private readonly List<AppScanner.AppInfo> _apps;
+        private readonly ListBox _list = new ListBox
+        {
+            Background = Brushes.Transparent,
+            BorderThickness = new Thickness(0),
+            Foreground = Brushes.White
+        };
+
         public StartSurface(string title, IEnumerable<AppScanner.AppInfo> apps)
         {
+            _apps = apps
+                .OrderBy(x => x.Group)
+                .ThenBy(x => x.Name)
+                .Take(250)
+                .ToList();
+
             var root = new StackPanel { Margin = new Thickness(24) };
             root.Children.Add(new TextBlock
             {
@@ -23,38 +38,72 @@ namespace WindBar.App.Views
                 Margin = new Thickness(0, 0, 0, 18)
             });
 
-            var list = new ListBox
+            var search = new TextBox
             {
-                Background = Brushes.Transparent,
-                BorderThickness = new Thickness(0),
-                Foreground = Brushes.White
+                Margin = new Thickness(0, 0, 0, 14),
+                Padding = new Thickness(10, 7, 10, 7),
+                MinWidth = 320,
+                ToolTip = "Type to filter apps"
             };
-            list.MouseDoubleClick += (_, __) => LaunchSelected(list);
-            list.KeyDown += (_, e) =>
+            search.TextChanged += (_, __) => PopulateList(search.Text);
+            search.KeyDown += (_, e) =>
+            {
+                if (e.Key == Key.Down && _list.Items.Count > 0)
+                {
+                    _list.SelectedIndex = Math.Max(0, _list.SelectedIndex);
+                    _list.Focus();
+                    e.Handled = true;
+                }
+            };
+            root.Children.Add(search);
+
+            _list.MouseDoubleClick += (_, __) => LaunchSelected();
+            _list.KeyDown += (_, e) =>
             {
                 if (e.Key == Key.Enter)
                 {
-                    LaunchSelected(list);
+                    LaunchSelected();
                     e.Handled = true;
                 }
             };
 
-            foreach (var app in apps.Take(100).OrderBy(x => x.Group).ThenBy(x => x.Name))
+            PopulateList(string.Empty);
+            root.Children.Add(_list);
+            Content = root;
+        }
+
+        private void PopulateList(string query)
+        {
+            _list.Items.Clear();
+            var normalized = (query ?? string.Empty).Trim();
+            var matches = string.IsNullOrWhiteSpace(normalized)
+                ? _apps
+                : _apps.Where(app => Matches(app, normalized));
+
+            foreach (var app in matches.Take(100))
             {
-                list.Items.Add(new ListBoxItem
+                _list.Items.Add(new ListBoxItem
                 {
                     Content = $"{app.Group}  •  {app.Name}",
                     Tag = app.Path,
                     ToolTip = app.Path
                 });
             }
-            root.Children.Add(list);
-            Content = root;
+
+            if (_list.Items.Count > 0)
+                _list.SelectedIndex = 0;
         }
 
-        private static void LaunchSelected(ListBox list)
+        private static bool Matches(AppScanner.AppInfo app, string query)
         {
-            if (list.SelectedItem is not ListBoxItem item || item.Tag is not string path)
+            return app.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || app.Group.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || app.Path.Contains(query, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void LaunchSelected()
+        {
+            if (_list.SelectedItem is not ListBoxItem item || item.Tag is not string path)
                 return;
 
             try
