@@ -53,6 +53,8 @@ Behavior:
 - On a top taskbar, the panel slides downward out of the player.
 - The slideout should use a short, soft ease-out animation.
 - Transport buttons inside the compact module should keep working without accidentally toggling the slideout.
+- The slideout should show a thin progress bar when the media source exposes timeline data.
+- Unsupported transport buttons should be disabled rather than hidden, so the layout stays stable.
 
 This gives the module a distinctive identity while still feeling polished and Windows-native.
 
@@ -134,3 +136,4 @@ This should be user-configurable.
 3. Wire it as an optional module in the right or center zone.
 4. Replace fake data with Windows media session data.
 5. Add a cassette/CD-style slideout panel with expanded controls.
+6. Add progress bar visuals, time formatting and supported-control state.
