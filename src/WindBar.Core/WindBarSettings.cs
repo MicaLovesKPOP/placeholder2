@@ -27,6 +27,13 @@ namespace WindBar.Core
         Right
     }
 
+    public enum MediaNoSessionBehavior
+    {
+        ShowMutedLastSource,
+        HideModule,
+        CollapseModule
+    }
+
     public sealed class TaskbarModulePlacement
     {
         public string Id { get; set; } = string.Empty;
@@ -47,6 +54,8 @@ namespace WindBar.Core
         public bool ShowPinnedApps { get; set; } = true;
         public bool ShowOpenApps { get; set; } = true;
         public bool ShowMediaMiniPlayer { get; set; } = true;
+        public string PreferredMediaSourceContains { get; set; } = string.Empty;
+        public MediaNoSessionBehavior MediaNoSessionBehavior { get; set; } = MediaNoSessionBehavior.ShowMutedLastSource;
         public bool ShowThemeButton { get; set; } = true;
         public bool ShowPlacementButton { get; set; } = true;
         public bool ShowAutoHideButton { get; set; } = true;
