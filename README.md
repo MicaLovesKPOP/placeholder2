@@ -1,6 +1,6 @@
 # WindBar
 
-WindBar is an Explorer-safe Windows 11 taskbar replacement prototype written in C# and WPF. It keeps Explorer alive, draws its own topmost taskbar, and provides the groundwork for a modular taskbar with Start menu providers, widgets, themes, top and bottom placement, auto-hide, smart app discovery, persistent pinned apps, running-app visibility/activation/toggling, and future per-monitor layouts.
+WindBar is an Explorer-safe Windows 11 taskbar replacement prototype written in C# and WPF. It keeps Explorer alive, draws its own topmost taskbar, and provides the groundwork for a modular taskbar with Start menu providers, widgets, themes, top and bottom placement, auto-hide, smart app discovery, persistent pinned apps, running-app visibility/activation/toggling, universal media miniplayer groundwork, and future per-monitor layouts.
 
 ## Current prototype
 
@@ -12,7 +12,7 @@ Implemented now:
 - Auto-hide prototype.
 - Light, dark, OLED and transparent theme modes.
 - Left, center and right taskbar zones.
-- Module visibility flags for Start, Search, Start switcher, pinned apps, running apps, theme, placement, auto-hide, settings and clock.
+- Module visibility flags for Start, Search, Start switcher, pinned apps, running apps, media miniplayer, theme, placement, auto-hide, settings and clock.
 - Settings window for toggling modules, changing theme, switching top/bottom placement, enabling auto-hide and choosing Start style.
 - Start provider switching buttons.
 - Windows 11 style Start provider.
@@ -26,6 +26,8 @@ Implemented now:
 - Running-app buttons can activate/restore their windows through Win32.
 - Running-app buttons now show a different marker for the current foreground window.
 - Clicking an already-foreground running app minimizes it, while clicking an inactive running app restores/activates it.
+- Universal media session models and provider contract.
+- First visible media miniplayer module using a sample universal media provider.
 - Core settings model.
 - Settings persistence in the user AppData folder.
 - Widget contract and widget manager.
@@ -38,6 +40,7 @@ Implemented now:
 - Grouping by app identity.
 - Task thumbnails and preview flyouts.
 - Jump lists.
+- Real Windows media session provider for the miniplayer.
 - Tray hosting.
 - Appbar registration and work-area reservation.
 - Multi-monitor support.
@@ -62,4 +65,4 @@ The final product should support:
 
 Open windbar.sln in Visual Studio 2022 or newer and build WindBar.App.
 
-The next milestone is a safer app identity/grouping model, followed by preview thumbnails and tray/appbar hosting.
+The next milestone is a real Windows media session provider for the miniplayer, plus a safer app identity/grouping model for task buttons.
