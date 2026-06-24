@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,6 +16,7 @@ namespace WindBar.App
     public partial class MainWindow : Window
     {
         private readonly SettingsStore _settingsStore = new SettingsStore();
+        private readonly AppScanner _appScanner = new AppScanner();
         private readonly WindBarSettings _settings;
         private readonly Grid _root = new Grid();
         private readonly StackPanel _left = new StackPanel { Orientation = Orientation.Horizontal };
@@ -83,9 +86,16 @@ namespace WindBar.App
             _left.Children.Add(MakeButton("10", (_, __) => SelectStart("start.win10"), "Use modern Start"));
             _left.Children.Add(MakeButton("8.1", (_, __) => SelectStart("start.win81"), "Use full screen Start"));
 
-            _center.Children.Add(MakeButton("Edge", null, "Pinned app"));
-            _center.Children.Add(MakeButton("Files", null, "Pinned app"));
-            _center.Children.Add(MakeButton("Code", null, "Pinned app"));
+            foreach (var app in _appScanner.ScanSmartDefaults().Take(5))
+            {
+                _center.Children.Add(MakeButton(app.Name, (_, __) => Launch(app.Path), app.Path));
+            }
+            if (_center.Children.Count == 0)
+            {
+                _center.Children.Add(MakeButton("Files", null, "Pinned app"));
+                _center.Children.Add(MakeButton("Browser", null, "Pinned app"));
+                _center.Children.Add(MakeButton("Code", null, "Pinned app"));
+            }
 
             _right.Children.Add(MakeButton("Theme", CycleTheme, "Cycle theme"));
             _right.Children.Add(MakeButton("Top/Bottom", ToggleEdge, "Move taskbar"));
@@ -108,6 +118,17 @@ namespace WindBar.App
             };
             if (action != null) button.Click += action;
             return button;
+        }
+
+        private static void Launch(string path)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            }
+            catch
+            {
+            }
         }
 
         private void StartClock()
