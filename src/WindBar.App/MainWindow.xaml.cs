@@ -38,7 +38,7 @@ namespace WindBar.App
             try
             {
                 windowsMedia.InitializeAsync().GetAwaiter().GetResult();
-                _mediaProvider = windowsMedia;
+                _mediaProvider = windowsMedia.IsAvailable ? windowsMedia : new SampleMediaProvider();
             }
             catch
             {
