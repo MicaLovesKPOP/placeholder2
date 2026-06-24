@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -9,7 +9,9 @@
     <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
     <EnableDefaultPageItems>false</EnableDefaultPageItems>
   </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\WindBar.Core\WindBar.Core.csproj" />
+    <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.26100.4654" />
   </ItemGroup>
 </Project>
