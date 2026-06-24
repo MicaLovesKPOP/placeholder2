@@ -15,6 +15,8 @@ namespace WindBar.App
 {
     public partial class MainWindow : Window
     {
+        private const int MaxCenterButtons = 10;
+
         private readonly SettingsStore _settingsStore = new SettingsStore();
         private readonly PinnedAppService _pinnedAppService = new PinnedAppService();
         private readonly OpenAppService _openAppService = new OpenAppService();
@@ -139,6 +141,7 @@ namespace WindBar.App
         private void BuildCenterZone()
         {
             _center.Children.Clear();
+            var centerItems = new List<(string Text, RoutedEventHandler? Action, string Tooltip)>();
             var openGroups = _openAppService.GetOpenAppGroups().ToList();
             var openKeys = openGroups.Select(group => group.AppKey).ToHashSet(StringComparer.OrdinalIgnoreCase);
             var shownOpenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -150,7 +153,7 @@ namespace WindBar.App
                     var key = OpenAppService.CreateAppKey(string.Empty, app.Path);
                     var isRunning = openKeys.Contains(key);
                     var label = isRunning ? "● " + app.Name : app.Name;
-                    _center.Children.Add(MakeButton(label, (_, __) => Launch(app.Path), app.Path));
+                    centerItems.Add((label, (_, __) => Launch(app.Path), app.Path));
                     if (isRunning)
                         shownOpenKeys.Add(key);
                 }
@@ -158,25 +161,35 @@ namespace WindBar.App
 
             if (_settings.ShowOpenApps)
             {
-                var added = 0;
                 foreach (var group in openGroups)
                 {
                     if (shownOpenKeys.Contains(group.AppKey))
                         continue;
 
-                    if (added >= 6) break;
                     var marker = group.IsActive ? "● " : "○ ";
                     var suffix = group.WindowCount > 1 ? $" ({group.WindowCount})" : string.Empty;
-                    _center.Children.Add(MakeButton(marker + group.DisplayName + suffix, (_, __) => _openAppService.ActivateOrToggle(group.PrimaryWindow), group.PrimaryWindow.Title));
-                    added++;
+                    centerItems.Add((marker + group.DisplayName + suffix, (_, __) => _openAppService.ActivateOrToggle(group.PrimaryWindow), group.PrimaryWindow.Title));
                 }
             }
 
-            if (_center.Children.Count == 0)
+            if (centerItems.Count == 0)
             {
                 _center.Children.Add(MakeButton("Files", null, "Pinned app"));
                 _center.Children.Add(MakeButton("Browser", null, "Pinned app"));
                 _center.Children.Add(MakeButton("Code", null, "Pinned app"));
+                return;
+            }
+
+            var visibleCount = centerItems.Count <= MaxCenterButtons ? centerItems.Count : MaxCenterButtons - 1;
+            foreach (var item in centerItems.Take(visibleCount))
+            {
+                _center.Children.Add(MakeButton(item.Text, item.Action, item.Tooltip));
+            }
+
+            var hiddenCount = centerItems.Count - visibleCount;
+            if (hiddenCount > 0)
+            {
+                _center.Children.Add(MakeButton($"+{hiddenCount}", null, $"{hiddenCount} more taskbar item(s) hidden by the current overflow limit"));
             }
         }
 
