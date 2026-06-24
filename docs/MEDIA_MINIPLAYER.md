@@ -4,7 +4,7 @@
 
 The first custom plugin target for WindBar is a compact taskbar media miniplayer. The idea is a Winamp-inspired mini control surface that integrates cleanly with Windows 11 instead of looking like a retro skin pasted onto the taskbar.
 
-The reference use case is a compact taskbar item for YouTube Music, Spotify, browsers and local players.
+The reference use case is a compact universal media item for YouTube Music, Spotify, browsers and local players.
 
 ## Product feel
 
@@ -22,8 +22,8 @@ Recommended default layout:
 1. Source icon or album art thumbnail.
 2. Track title, clipped with ellipsis.
 3. Artist or source name, optional in compact mode.
-4. Previous, play/pause and next controls on hover or expanded mode.
-5. Optional progress bar as a very thin accent line under the text.
+4. Previous, play/pause and next controls in compact mode when space allows.
+5. Optional progress information in the expanded slideout.
 
 Very compact mode can use:
 
@@ -40,6 +40,21 @@ Expanded mode can use:
 - Previous/play-next controls
 - Progress/time
 - Volume shortcut
+
+## Cassette/CD slideout interaction
+
+The preferred expanded interaction is a slideout panel rather than a plain popup. The mental model is a cassette or CD tray sliding out of the compact player.
+
+Behavior:
+
+- The compact taskbar miniplayer remains small and always available.
+- Clicking the body of the miniplayer opens a richer panel anchored to the module.
+- On a bottom taskbar, the panel slides upward out of the player.
+- On a top taskbar, the panel slides downward out of the player.
+- The slideout should use a short, soft ease-out animation.
+- Transport buttons inside the compact module should keep working without accidentally toggling the slideout.
+
+This gives the module a distinctive identity while still feeling polished and Windows-native.
 
 ## Vertical layout behavior
 
@@ -88,7 +103,7 @@ The media service should expose:
 - Timeline/progress when available
 - Supported controls
 
-The first prototype can fall back to detected media app windows when media session data is unavailable.
+The first prototype can fall back to sample data when media session data is unavailable.
 
 ## Plugin requirements created by this design
 
@@ -118,4 +133,4 @@ This should be user-configurable.
 2. Add a placeholder miniplayer module using fake sample data.
 3. Wire it as an optional module in the right or center zone.
 4. Replace fake data with Windows media session data.
-5. Add hover/expanded flyout controls.
+5. Add a cassette/CD-style slideout panel with expanded controls.
