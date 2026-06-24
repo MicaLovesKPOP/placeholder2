@@ -93,7 +93,7 @@ These are the requirements that should be considered part of the current product
 - [x] Persist main settings to AppData.
 - [x] Persist pinned apps to AppData.
 - [x] Settings window for common module visibility and basic choices.
-- [ ] Settings reset/recovery path if the user hides important controls.
+- [x] Settings reset/recovery path if the user hides important controls.
 - [ ] Settings for module order and zone placement.
 - [ ] Settings for media no-session behavior and preferred source.
 - [ ] Settings import/export.
